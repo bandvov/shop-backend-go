@@ -38,6 +38,8 @@ func main() {
 
 	http.HandleFunc("/", handlers.getRoot)
 	http.HandleFunc("/hello", handlers.getHello(conn))
+	http.HandleFunc("/add", handlers.addUser(conn))
+	http.HandleFunc("/users-list", handlers.getUsers(conn))
 
 	err = http.ListenAndServe(fmt.Sprintf(":%v", port), nil)
 	if errors.Is(err, http.ErrServerClosed) {
