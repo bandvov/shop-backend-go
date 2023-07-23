@@ -12,13 +12,15 @@ import (
 )
 
 func main() {
-
-	ctx := context.Background()
-
+	var err error
 	connString, err := getEnvVariable("CONN_STRING")
-
+	if err != nil {
+		log.Fatal(err)
+	}
 	port, err := getEnvVariable("PORT")
-
+	if err != nil {
+		log.Fatal(err)
+	}
 	config, err := pgx.ParseConfig(connString)
 	if err != nil {
 		log.Fatal(err)
@@ -32,13 +34,10 @@ func main() {
 	app := NewApp(conn)
 	handlers := Handlers{}
 
-	app.Conn.Begin(ctx)
-	defer app.Conn.Close(ctx)
-
 	fmt.Print(app)
 
 	http.HandleFunc("/", handlers.getRoot)
-	http.HandleFunc("/hello", handlers.getHello)
+	http.HandleFunc("/hello", handlers.getHello(conn))
 
 	err = http.ListenAndServe(fmt.Sprintf(":%v", port), nil)
 	if errors.Is(err, http.ErrServerClosed) {
