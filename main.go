@@ -31,15 +31,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	app := NewApp(conn)
 	handlers := Handlers{}
+	app := NewApp(conn, handlers)
 
 	fmt.Print(app)
 
-	http.HandleFunc("/", handlers.getRoot)
-	http.HandleFunc("/hello", handlers.getHello(conn))
-	http.HandleFunc("/add", handlers.addUser(conn))
-	http.HandleFunc("/users-list", handlers.getUsers(conn))
+	http.HandleFunc("/add", app.Handlers.addUser(app.Conn))
+	http.HandleFunc("/users-list", app.Handlers.getUsers(app.Conn))
 
 	err = http.ListenAndServe(fmt.Sprintf(":%v", port), nil)
 	if errors.Is(err, http.ErrServerClosed) {

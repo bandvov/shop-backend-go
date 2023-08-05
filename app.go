@@ -5,12 +5,14 @@ import (
 )
 
 type App struct {
-	Conn *pgx.Conn
+	Conn     *pgx.Conn
+	Handlers Handlers
 }
 
-func NewApp(conn *pgx.Conn) *App {
+func NewApp(conn *pgx.Conn, h Handlers) App {
 
-	return &App{
-		Conn: conn,
+	return App{
+		Conn:     conn,
+		Handlers: Handlers{},
 	}
 }
