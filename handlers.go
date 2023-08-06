@@ -48,7 +48,7 @@ func (h *Handlers) addUser(conn *pgx.Conn) func(w http.ResponseWriter, r *http.R
 		user.Password = hashedPassword
 		validate(user, "email", "phone", "password")
 
-		rows, err := conn.Query(context.Background(), `INSERT INTO users (email, phone, full_name, password) values ($1, $2, $3, $4) RETURNING *;`, &user.Email, &user.Phone, &user.FullName, &user.Password)
+		rows, err := conn.Query(context.Background(), AddUserQuery, &user.Email, &user.Phone, &user.FullName, &user.Password)
 		defer rows.Close()
 		w.Write([]byte("User created"))
 	}

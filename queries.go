@@ -1,19 +1,3 @@
 package main
 
-type Queries struct{}
-
-func (q *Queries) CreateTableQuery() string {
-
-	return `CREATE TABLE apply_leave1 (
-		leaveid serial PRIMARY KEY NOT NULL ,
-		mdays double precision NOT NULL DEFAULT 0 ,
-		leavetype varchar(20) NOT NULL DEFAULT '' ,
-		daytype text NOT NULL '',
-		leavefrom timestamp with time zone NOT NULL,
-		leaveto timestamp with time zone NOT NULL,
-		applieddate timestamp with time zone NOT NULL,
-		leavestatus varchar(15) NOT NULL DEFAULT ''  ,
-		resultdate timestamp with time zone,
-		certificatestatus bool NOT NULL DEFAULT FALSE 
-		certificate json NULL)`
-}
+var AddUserQuery = `INSERT INTO users (email, phone, full_name, password) values ($1, $2, $3, $4) RETURNING *;`
