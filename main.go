@@ -34,10 +34,8 @@ func main() {
 	handlers := Handlers{}
 	app := NewApp(conn, handlers)
 
-	fmt.Print(app)
-
-	http.HandleFunc("/add", app.Handlers.addUser(app.Conn))
-	http.HandleFunc("/users-list", app.Handlers.getUsers(app.Conn))
+	http.HandleFunc("/add-user", app.Handlers.addUser(app.Conn))
+	http.HandleFunc("/users", app.Handlers.getUsers(app.Conn))
 
 	err = http.ListenAndServe(fmt.Sprintf(":%v", port), nil)
 	if errors.Is(err, http.ErrServerClosed) {
