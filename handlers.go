@@ -19,7 +19,6 @@ func (h *Handlers) getRoot(w http.ResponseWriter, r *http.Request) {
 }
 func (h *Handlers) getHello(conn *pgx.Conn) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Printf("got /hello request\n")
 		io.WriteString(w, "Hello, HTTP!\n")
 	}
 }
@@ -27,29 +26,39 @@ func (h *Handlers) addUser(conn *pgx.Conn) func(w http.ResponseWriter, r *http.R
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		if r.Body == http.NoBody {
-			log.Println("No body")
 			http.Error(w, "No body", http.StatusBadRequest)
 			return
 		}
+
 		var user User
+
 		err := json.NewDecoder(r.Body).Decode(&user)
 		if err != nil {
-			log.Printf("Error reading body: %v\n", err)
 			http.Error(w, "can't read body", http.StatusBadRequest)
 			return
 		}
-		fmt.Println(user)
+
+		userExists := checkUserExists(user.Email, conn)
+		if userExists {
+			http.Error(w, "User already exists", http.StatusBadRequest)
+			return
+		}
+
+		validate(user, "email", "phone", "password")
+
 		hashedPassword, err := hashPassword(user.Password)
 		if err != nil {
-			log.Printf("Error while hashing: %v\n", err)
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
-		user.Password = hashedPassword
-		validate(user, "email", "phone", "password")
 
-		rows, err := conn.Query(context.Background(), AddUserQuery, &user.Email, &user.Phone, &user.FullName, &user.Password)
+		user.Password = hashedPassword
+
+		rows, err := conn.Query(context.Background(), CreateUserQuery, &user.Email, &user.Phone, &user.FullName, &user.Password)
 		defer rows.Close()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
 		w.Write([]byte("User created"))
 	}
 
