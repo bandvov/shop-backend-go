@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"io"
 	"log"
 	"net/http"
 
@@ -13,16 +11,7 @@ import (
 
 type Handlers struct{}
 
-func (h *Handlers) getRoot(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("got / request\n")
-	io.WriteString(w, "This is my website!\n")
-}
-func (h *Handlers) getHello(conn *pgx.Conn) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, "Hello, HTTP!\n")
-	}
-}
-func (h *Handlers) addUser(conn *pgx.Conn) func(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) createUser(conn *pgx.Conn) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		if r.Body == http.NoBody {
