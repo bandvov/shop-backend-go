@@ -3,6 +3,7 @@ module github.com/bandvov/shop-backend-go
 go 1.20
 
 require (
+	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.14.0 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect

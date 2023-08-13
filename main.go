@@ -35,6 +35,7 @@ func main() {
 	app := NewApp(conn, handlers)
 
 	http.HandleFunc("/register", app.Handlers.createUser(app.Conn))
+	http.HandleFunc("/login", app.Handlers.login(app.Conn))
 	http.HandleFunc("/users", app.Handlers.getUsers(app.Conn))
 	http.HandleFunc("/", http.NotFound)
 

@@ -3,8 +3,10 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/jackc/pgx/v4"
 )
@@ -14,6 +16,7 @@ type Handlers struct{}
 func (h *Handlers) createUser(conn *pgx.Conn) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
+
 		if r.Body == http.NoBody {
 			http.Error(w, "No body", http.StatusBadRequest)
 			return
@@ -27,9 +30,9 @@ func (h *Handlers) createUser(conn *pgx.Conn) func(w http.ResponseWriter, r *htt
 			return
 		}
 
-		isNotValid, errors := validate(user)
+		errors := validate(user)
 
-		if isNotValid {
+		if len(errors) > 0 {
 			w.WriteHeader(500)
 			marshalledErrors, _ := json.Marshal(errors)
 			w.Write(marshalledErrors)
@@ -37,7 +40,7 @@ func (h *Handlers) createUser(conn *pgx.Conn) func(w http.ResponseWriter, r *htt
 		}
 
 		userExists := checkUserExists(user.Email, conn)
-		if userExists {
+		if &userExists != nil {
 			http.Error(w, "User already exists", http.StatusBadRequest)
 			return
 		}
@@ -50,7 +53,13 @@ func (h *Handlers) createUser(conn *pgx.Conn) func(w http.ResponseWriter, r *htt
 
 		user.Password = hashedPassword
 
-		rows, err := conn.Query(context.Background(), CreateUserQuery, &user.Email, &user.Phone, &user.FullName, &user.Password)
+		ctx := context.Background()
+		ctxWithCancel, cancel := context.WithCancel(ctx)
+
+		defer cancel()
+
+		rows, err := conn.Query(ctxWithCancel, CreateUserQuery, &user.Email, &user.Phone, &user.FullName, &user.Password)
+
 		defer rows.Close()
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -63,10 +72,14 @@ func (h *Handlers) createUser(conn *pgx.Conn) func(w http.ResponseWriter, r *htt
 func (h *Handlers) getUsers(conn *pgx.Conn) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var users = make([]*User, 0)
-		rows, err := conn.Query(context.Background(), `SELECT * FROM users`)
+		ctx := context.Background()
+		ctxWithCancel, cancel := context.WithCancel(ctx)
+
+		rows, err := conn.Query(ctxWithCancel, `SELECT * FROM users`)
 		if err != nil {
 			log.Fatal(err)
 		}
+		defer cancel()
 		defer rows.Close()
 
 		for rows.Next() {
@@ -79,5 +92,54 @@ func (h *Handlers) getUsers(conn *pgx.Conn) func(w http.ResponseWriter, r *http.
 		}
 		marshaled, err := json.Marshal(users)
 		w.Write(marshaled)
+	}
+}
+
+func (h *Handlers) login(conn *pgx.Conn) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
+		if r.Body == http.NoBody {
+			http.Error(w, "No body", http.StatusBadRequest)
+			return
+		}
+
+		var body User
+
+		err := json.NewDecoder(r.Body).Decode(&body)
+		if err != nil {
+			http.Error(w, "can't read body", http.StatusBadRequest)
+			return
+		}
+
+		errors := validate(body)
+
+		if len(errors) > 0 {
+			w.WriteHeader(http.StatusInternalServerError)
+			marshalledErrors, _ := json.Marshal(errors)
+			w.Write(marshalledErrors)
+			return
+		}
+
+		userExists := checkUserExists(body.Email, conn)
+		if &userExists == nil {
+			http.Error(w, "User does not exist", http.StatusBadRequest)
+			return
+		}
+		token, err := generateJWT(userExists)
+		if err != nil {
+			fmt.Println(fmt.Errorf("JWT generating error: %+v", err))
+		}
+		http.SetCookie(w, &http.Cookie{
+			Name:     "access-token",
+			Value:    token,
+			Path:     "/",
+			Secure:   true,
+			SameSite: http.SameSiteDefaultMode,
+			Expires:  time.Now().Add(24 * time.Hour),
+		})
+		fmt.Println(userExists)
+		res, _ := json.Marshal(userExists)
+		w.Write(res)
 	}
 }
