@@ -49,10 +49,9 @@ func Test_validate(t *testing.T) {
 		fields []string
 	}
 	tests := []struct {
-		name  string
-		args  args
-		want  bool
-		want1 map[string][]string
+		name string
+		args args
+		want map[string][]string
 	}{
 		{
 			name: "validate all required field valid",
@@ -63,8 +62,7 @@ func Test_validate(t *testing.T) {
 					Email:    "test@test.aa",
 				},
 			},
-			want:  false,
-			want1: make(map[string][]string),
+			want: make(map[string][]string),
 		},
 		{
 			name: "validate all required field not valid",
@@ -75,18 +73,15 @@ func Test_validate(t *testing.T) {
 					Email:    "",
 				},
 			},
-			want:  true,
-			want1: errors,
+			want: errors,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1 := validate(tt.args.body, tt.args.fields...)
-			if got != tt.want {
-				t.Errorf("validate() got = %v, want %v", got, tt.want)
-			}
-			if !reflect.DeepEqual(got1, tt.want1) {
-				t.Errorf("validate() got1 = %v, want %v", got1, tt.want1)
+			got := validate(tt.args.body, tt.args.fields...)
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("validate() got1 = %v, want %v", got, tt.want)
 			}
 		})
 	}

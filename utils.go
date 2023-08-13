@@ -1,16 +1,85 @@
 package main
 
 import (
+	"crypto/sha256"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"reflect"
 	"strings"
+	"time"
 	"unicode"
 
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
+
+var sampleSecretKey = []byte(os.Getenv("JWT_SECRET"))
+
+func generateHmacKey() []byte {
+	h := sha256.New()
+	h.Write(sampleSecretKey)
+	return h.Sum(nil)
+}
+
+func generateJWT(data interface{}) (string, error) {
+
+	// Create a new token object, specifying signing method and the claims
+	// you would like it to contain.
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user":    data,
+		"Expires": time.Now().Add(24 * time.Hour),
+	})
+	hmacKey := generateHmacKey()
+
+	fmt.Println(hmacKey)
+
+	// Sign and get the complete encoded token as a string using the secret
+	tokenString, err := token.SignedString(hmacKey)
+	if err != nil {
+		fmt.Println(fmt.Errorf("jwt error%+v", err))
+	}
+
+	return tokenString, nil
+}
+
+func verifyJWT(next func(writer http.ResponseWriter, request *http.Request)) http.HandlerFunc {
+
+	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+
+		accessTokenCookie, err := request.Cookie("access-token")
+		if err != nil {
+			writer.WriteHeader(http.StatusUnauthorized)
+			writer.Write([]byte("You're Unauthorized!"))
+			return
+		}
+		
+		token, err := jwt.Parse(accessTokenCookie.Value, func(token *jwt.Token) (interface{}, error) {
+			_, ok := token.Method.(*jwt.SigningMethodECDSA)
+			if !ok {
+				writer.WriteHeader(http.StatusUnauthorized)
+				writer.Write([]byte("You're Unauthorized!"))
+			}
+			return "", nil
+		})
+		if err != nil {
+			writer.WriteHeader(http.StatusUnauthorized)
+			writer.Write([]byte("You're Unauthorized due to error parsing the JWT"))
+		}
+
+		if token.Valid {
+			next(writer, request)
+		} else {
+			writer.WriteHeader(http.StatusUnauthorized)
+			_, err := writer.Write([]byte("You're Unauthorized due to invalid token"))
+			if err != nil {
+				return
+			}
+		}
+	})
+}
 
 func getEnvVariable(name string) (string, error) {
 	var errMessage = "No %v in environment variables"
@@ -38,7 +107,7 @@ func capitalize(str string) string {
 }
 
 // validate is used to validate fields in struct
-func validate(body interface{}, fields ...string) (bool, map[string][]string) {
+func validate(body interface{}, fields ...string) map[string][]string {
 
 	var bodyMap map[string]interface{}
 	inrec, _ := json.Marshal(body)
@@ -62,6 +131,6 @@ func validate(body interface{}, fields ...string) (bool, map[string][]string) {
 			}
 		}
 	}
-	var isNotValid = len(validationErrors) > 0
-	return isNotValid, validationErrors
+
+	return validationErrors
 }
