@@ -30,13 +30,15 @@ func checkPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
+// capitalize is used to capitalize string
 func capitalize(str string) string {
 	runes := []rune(str)
 	runes[0] = unicode.ToUpper(runes[0])
 	return string(runes)
 }
 
-func validate[T comparable](body T, fields ...string) (bool, map[string][]string) {
+// validate is used to validate fields in struct
+func validate(body interface{}, fields ...string) (bool, map[string][]string) {
 
 	var bodyMap map[string]interface{}
 	inrec, _ := json.Marshal(body)
@@ -56,7 +58,7 @@ func validate[T comparable](body T, fields ...string) (bool, map[string][]string
 
 		for _, v := range validateTagValue {
 			if v == "required" && len(bodyMap[fieldName].(string)) == 0 {
-				validationErrors[fieldName] = append(validationErrors[fieldName], fmt.Sprintf("%v is required ", fieldName))
+				validationErrors[fieldName] = append(validationErrors[fieldName], fmt.Sprintf("%v is required", fieldName))
 			}
 		}
 	}

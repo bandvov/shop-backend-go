@@ -38,7 +38,7 @@ func (h *Handlers) addUser(conn *pgx.Conn) func(w http.ResponseWriter, r *http.R
 			return
 		}
 
-		isNotValid, errors := validate[User](user)
+		isNotValid, errors := validate(user)
 
 		if isNotValid {
 			w.WriteHeader(500)
