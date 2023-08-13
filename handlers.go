@@ -38,13 +38,20 @@ func (h *Handlers) addUser(conn *pgx.Conn) func(w http.ResponseWriter, r *http.R
 			return
 		}
 
+		isNotValid, errors := validate[User](user)
+
+		if isNotValid {
+			w.WriteHeader(500)
+			marshalledErrors, _ := json.Marshal(errors)
+			w.Write(marshalledErrors)
+			return
+		}
+
 		userExists := checkUserExists(user.Email, conn)
 		if userExists {
 			http.Error(w, "User already exists", http.StatusBadRequest)
 			return
 		}
-
-		validate(user, "email", "phone", "password")
 
 		hashedPassword, err := hashPassword(user.Password)
 		if err != nil {

@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"reflect"
+	"strings"
 	"unicode"
 
 	"golang.org/x/crypto/bcrypt"
@@ -34,16 +36,30 @@ func capitalize(str string) string {
 	return string(runes)
 }
 
-func validate(body interface{}, fields ...string) (bool, []error) {
+func validate[T comparable](body T, fields ...string) (bool, map[string][]string) {
 
 	var bodyMap map[string]interface{}
 	inrec, _ := json.Marshal(body)
 	json.Unmarshal(inrec, &bodyMap)
 
-	// var errors []error
-	for _, v := range fields {
+	t := reflect.TypeOf(body)
 
-		fmt.Println(bodyMap[v])
+	var validationErrors = make(map[string][]string)
+
+	for fieldName := range bodyMap {
+		field, found := t.FieldByName(capitalize(fieldName))
+		if !found {
+			continue
+		}
+
+		validateTagValue := strings.Split(field.Tag.Get("validate"), ",")
+
+		for _, v := range validateTagValue {
+			if v == "required" && len(bodyMap[fieldName].(string)) == 0 {
+				validationErrors[fieldName] = append(validationErrors[fieldName], fmt.Sprintf("%v is required ", fieldName))
+			}
+		}
 	}
-	return true, nil
+	var isNotValid = len(validationErrors) > 0
+	return isNotValid, validationErrors
 }
