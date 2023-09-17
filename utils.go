@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/sha256"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -33,8 +32,6 @@ func generateJWT(data interface{}) (string, error) {
 		"Expires": time.Now().Add(24 * time.Hour),
 	})
 	hmacKey := generateHmacKey()
-
-	fmt.Println(hmacKey)
 
 	// Sign and get the complete encoded token as a string using the secret
 	tokenString, err := token.SignedString(hmacKey)
@@ -107,27 +104,27 @@ func capitalize(str string) string {
 }
 
 // validate is used to validate fields in struct
-func validate(body interface{}, fields ...string) map[string][]string {
+func validate(body interface{}, fields ...string) ValidationErrors {
 
-	var bodyMap map[string]interface{}
-	inrec, _ := json.Marshal(body)
-	json.Unmarshal(inrec, &bodyMap)
-
+	v := reflect.ValueOf(body)
 	t := reflect.TypeOf(body)
+	typeOfS := v.Type()
 
-	var validationErrors = make(map[string][]string)
-
-	for fieldName := range bodyMap {
-		field, found := t.FieldByName(capitalize(fieldName))
-		if !found {
-			continue
-		}
+	var validationErrors = make(ValidationErrors)
+	// v.NumField() is a count of fields in struct
+	for i := 0; i < v.NumField(); i++ {
+		fieldName := typeOfS.Field(i).Name
+		fieldValue := v.Field(i).Interface()
+		// fmt.Printf("Field: %s\tValue: %v\n", fieldName, fieldValue)
+		field, _ := t.FieldByName(fieldName)
 
 		validateTagValue := strings.Split(field.Tag.Get("validate"), ",")
-
-		for _, v := range validateTagValue {
-			if v == "required" && len(bodyMap[fieldName].(string)) == 0 {
-				validationErrors[fieldName] = append(validationErrors[fieldName], fmt.Sprintf("%v is required", fieldName))
+		if len(validateTagValue) == 0 {
+			continue
+		}
+		for _, tv := range validateTagValue {
+			if tv == "required" && len(fieldValue.(string)) == 0 {
+				validationErrors[strings.ToLower(fieldName)] = append(validationErrors[fieldName], fmt.Sprintf("%v is required", strings.ToLower(fieldName)))
 			}
 		}
 	}

@@ -39,7 +39,7 @@ func Test_getEnvVariable(t *testing.T) {
 }
 
 func Test_validate(t *testing.T) {
-	var errors = make(map[string][]string)
+	var errors = make(ValidationErrors)
 
 	errors["email"] = []string{"email is required"}
 	errors["password"] = []string{"password is required"}
@@ -51,7 +51,7 @@ func Test_validate(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want map[string][]string
+		want ValidationErrors
 	}{
 		{
 			name: "validate all required field valid",
@@ -62,7 +62,7 @@ func Test_validate(t *testing.T) {
 					Email:    "test@test.aa",
 				},
 			},
-			want: make(map[string][]string),
+			want: make(ValidationErrors),
 		},
 		{
 			name: "validate all required field not valid",
