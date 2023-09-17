@@ -1,14 +1,14 @@
 package main
 
 import (
-	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 
-	"github.com/jackc/pgx/v4"
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -21,22 +21,17 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	config, err := pgx.ParseConfig(connString)
+
+	db, err := sql.Open("postgres", connString)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	conn, err := pgx.ConnectConfig(context.Background(), config)
-	if err != nil {
-		log.Fatal(err)
-	}
+	app := NewApp(db)
 
-	handlers := Handlers{}
-	app := NewApp(conn, handlers)
-
-	http.HandleFunc("/register", app.Handlers.createUser(app.Conn))
-	http.HandleFunc("/login", app.Handlers.login(app.Conn))
-	http.HandleFunc("/users", app.Handlers.getUsers(app.Conn))
+	http.HandleFunc("/register", app.createUser)
+	http.HandleFunc("/login", app.login)
+	http.HandleFunc("/users", app.getUsers)
 	http.HandleFunc("/", http.NotFound)
 
 	err = http.ListenAndServe(fmt.Sprintf(":%v", port), nil)

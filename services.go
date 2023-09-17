@@ -2,16 +2,20 @@ package main
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v4"
+	"database/sql"
+	"time"
 )
 
-func checkUserExists(e string, conn *pgx.Conn) User {
+func checkUserExists(e string, conn *sql.Conn) User {
 	var user User
 
 	// Replace 3 with an ID from your database or another random
 	// value to test the no rows use case.
-	row := conn.QueryRow(context.Background(), getUserByEmailQuery, e)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+
+	defer cancel()
+
+	row := conn.QueryRowContext(ctx, getUserByEmailQuery, e)
 	_ = row.Scan(&user.Email)
 
 	return user

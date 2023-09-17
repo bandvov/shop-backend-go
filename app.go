@@ -1,18 +1,16 @@
 package main
 
 import (
-	"github.com/jackc/pgx/v4"
+	"database/sql"
 )
 
 type App struct {
-	Conn     *pgx.Conn
-	Handlers Handlers
+	db *sql.DB
 }
 
-func NewApp(conn *pgx.Conn, h Handlers) App {
+func NewApp(db *sql.DB) App {
 
 	return App{
-		Conn:     conn,
-		Handlers: Handlers{},
+		db: db,
 	}
 }

@@ -55,7 +55,7 @@ func verifyJWT(next func(writer http.ResponseWriter, request *http.Request)) htt
 			writer.Write([]byte("You're Unauthorized!"))
 			return
 		}
-		
+
 		token, err := jwt.Parse(accessTokenCookie.Value, func(token *jwt.Token) (interface{}, error) {
 			_, ok := token.Method.(*jwt.SigningMethodECDSA)
 			if !ok {
