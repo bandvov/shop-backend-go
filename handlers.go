@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -11,6 +10,10 @@ import (
 
 func (a *App) createUser(w http.ResponseWriter, r *http.Request) {
 
+	if r.Body == http.NoBody {
+		http.Error(w, "No body", http.StatusBadRequest)
+		return
+	}
 	defer r.Body.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
@@ -19,10 +22,6 @@ func (a *App) createUser(w http.ResponseWriter, r *http.Request) {
 	conn, err := a.db.Conn(ctx)
 	if err != nil {
 		log.Fatal(err)
-	}
-	if r.Body == http.NoBody {
-		http.Error(w, "No body", http.StatusBadRequest)
-		return
 	}
 
 	var user User
@@ -103,6 +102,11 @@ func (a *App) getUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) login(w http.ResponseWriter, r *http.Request) {
+
+	if r.Body == http.NoBody {
+		http.Error(w, "No body", http.StatusBadRequest)
+		return
+	}
 	defer r.Body.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
@@ -111,11 +115,6 @@ func (a *App) login(w http.ResponseWriter, r *http.Request) {
 	conn, err := a.db.Conn(ctx)
 	if err != nil {
 		log.Fatal(err)
-	}
-
-	if r.Body == http.NoBody {
-		http.Error(w, "No body", http.StatusBadRequest)
-		return
 	}
 
 	var body User
@@ -136,24 +135,29 @@ func (a *App) login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userExists := checkUserExists(body.Email, conn)
+
 	if userExists.Email == "" {
 		http.Error(w, "User does not exist", http.StatusBadRequest)
 		return
 	}
-	hashedPassword, err := hashPassword(body.Password)
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
-	}
-	if hashedPassword != userExists.Password{
+
+	isPasswordCorrect := checkPasswordHash(body.Password, userExists.Password)
+
+	if !isPasswordCorrect {
 		http.Error(w, "Credentials not correct", http.StatusBadRequest)
 		return
 	}
+	tokenStruct := make(map[string]interface{})
 
-	token, err := generateJWT(userExists)
+	tokenStruct["email"] = userExists.Email
+	tokenStruct["user_id"] = userExists.UserId
+
+	token, err := generateJWT(tokenStruct)
 	if err != nil {
-		fmt.Println(fmt.Errorf("JWT generating error: %+v", err))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
+
 	http.SetCookie(w, &http.Cookie{
 		Name:     "access-token",
 		Value:    token,
@@ -162,6 +166,11 @@ func (a *App) login(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteDefaultMode,
 		Expires:  time.Now().Add(24 * time.Hour),
 	})
-	res, _ := json.Marshal(userExists)
+	res, _ := json.Marshal(LoginResponse{
+		UserId:    userExists.UserId,
+		Email:     userExists.Email,
+		CreatedAt: userExists.CreatedAt,
+		UpdatedAt: userExists.UpdatedAt,
+	})
 	w.Write(res)
 }

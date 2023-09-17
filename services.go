@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"log"
 	"time"
 )
 
@@ -16,7 +17,9 @@ func checkUserExists(e string, conn *sql.Conn) User {
 	defer cancel()
 
 	row := conn.QueryRowContext(ctx, getUserByEmailQuery, e)
-	_ = row.Scan(&user.Email)
-
+	err := row.Scan(&user.UserId, &user.Email, &user.Password)
+	if err != nil {
+		log.Fatal(err)
+	}
 	return user
 }

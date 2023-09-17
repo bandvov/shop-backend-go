@@ -33,8 +33,6 @@ func generateJWT(data interface{}) (string, error) {
 	})
 	hmacKey := generateHmacKey()
 
-	fmt.Println(hmacKey)
-
 	// Sign and get the complete encoded token as a string using the secret
 	tokenString, err := token.SignedString(hmacKey)
 	if err != nil {
@@ -113,15 +111,12 @@ func validate(body interface{}, fields ...string) ValidationErrors {
 	typeOfS := v.Type()
 
 	var validationErrors = make(ValidationErrors)
-
+	// v.NumField() is a count of fields in struct
 	for i := 0; i < v.NumField(); i++ {
 		fieldName := typeOfS.Field(i).Name
 		fieldValue := v.Field(i).Interface()
-		fmt.Printf("Field: %s\tValue: %v\n", fieldName, fieldValue)
-		field, found := t.FieldByName(fieldName)
-		if !found {
-			continue
-		}
+		// fmt.Printf("Field: %s\tValue: %v\n", fieldName, fieldValue)
+		field, _ := t.FieldByName(fieldName)
 
 		validateTagValue := strings.Split(field.Tag.Get("validate"), ",")
 		if len(validateTagValue) == 0 {

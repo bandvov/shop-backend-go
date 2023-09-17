@@ -13,3 +13,10 @@ type User struct {
 }
 
 type ValidationErrors map[string][]string
+
+type LoginResponse struct {
+	UserId    int       `json:"user_id,omitempty"`
+	Email     string    `json:"email,omitempty"`
+	CreatedAt time.Time `db:"created_at" json:"created_at,omitempty"`
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at,omitempty"`
+}
