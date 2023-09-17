@@ -126,7 +126,7 @@ func (a *App) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	errors := validate(body)
+	errors := validate(body, "password")
 
 	if len(errors) > 0 {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -140,6 +140,16 @@ func (a *App) login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "User does not exist", http.StatusBadRequest)
 		return
 	}
+	hashedPassword, err := hashPassword(body.Password)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	if hashedPassword != userExists.Password{
+		http.Error(w, "Credentials not correct", http.StatusBadRequest)
+		return
+	}
+
 	token, err := generateJWT(userExists)
 	if err != nil {
 		fmt.Println(fmt.Errorf("JWT generating error: %+v", err))
