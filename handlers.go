@@ -147,6 +147,7 @@ func (a *App) login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Credentials not correct", http.StatusBadRequest)
 		return
 	}
+	
 	tokenStruct := make(map[string]interface{})
 
 	tokenStruct["email"] = userExists.Email
