@@ -83,7 +83,7 @@ func (a *App) getUsers(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	rows, err := conn.QueryContext(ctx, `SELECT user_id,email,phone,full_name FROM users`)
+	rows, err := conn.QueryContext(ctx, getAllUsersQuery)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -147,7 +147,7 @@ func (a *App) login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Credentials not correct", http.StatusBadRequest)
 		return
 	}
-	
+
 	tokenStruct := make(map[string]interface{})
 
 	tokenStruct["email"] = userExists.Email
