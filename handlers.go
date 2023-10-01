@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -135,7 +136,7 @@ func (a *App) login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userExists := checkUserExists(body.Email, conn)
-
+	fmt.Println("userExists", userExists)
 	if userExists.Email == "" {
 		http.Error(w, "User does not exist", http.StatusBadRequest)
 		return

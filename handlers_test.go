@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -50,4 +51,47 @@ func TestApp_getUsers(t *testing.T) {
 	if !bytes.Equal(body, b) {
 		t.Errorf("Error. want: %v | have: %v", string(body), string(b))
 	}
+}
+
+func TestApp_login(t *testing.T) {
+	db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+
+	user := User{
+		UserId:   1,
+		Email:    "test@test.aa",
+		Password: "$2a$14$Gp3Kfg79XEZR5rV6ahOAjeIK225slynTJgZMhiHzlDLSHFrQKYolq",
+	}
+
+	app := &App{db: db}
+	query := getUserByEmailQuery
+
+	rows := sqlmock.NewRows([]string{"UserId", "Email", "Password"}).
+		AddRow(user.UserId, user.Email, user.Password)
+
+	mock.ExpectQuery(query).WillReturnRows(rows)
+
+	ts := httptest.NewServer(http.HandlerFunc(app.login))
+	defer ts.Close()
+
+	marshaled, _ := json.Marshal(User{Email: user.Email, Password: "1"})
+
+	requestBody := bytes.NewBuffer(marshaled)
+
+	fmt.Println(requestBody)
+	res, err := http.Post(ts.URL, "application/json", requestBody)
+	if err != nil {
+		log.Fatal(err)
+	}
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(fmt.Errorf("error in body: %+v", err))
+	}
+	defer res.Body.Close()
+
+	b, _ := json.Marshal(User{Email: user.Email, UserId: user.UserId})
+
+	if !bytes.Equal(body, b) {
+		t.Errorf("Error. want: %+v | have: %+v", string(body), string(b))
+	}
+
 }
