@@ -81,7 +81,7 @@ func verifyJWT(next func(writer http.ResponseWriter, request *http.Request)) htt
 func getEnvVariable(name string) (string, error) {
 	var errMessage = "No %v in environment variables"
 	connString, exists := os.LookupEnv(name)
-	fmt.Println(connString)
+ 
 	if !exists {
 		return "", errors.New(fmt.Sprintf(errMessage, name))
 	}

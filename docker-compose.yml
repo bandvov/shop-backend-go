@@ -7,8 +7,8 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: admin
+      - POSTGRES_DB_USER=${POSTGRES_DB_USER}
+      - POSTGRES_DB_USER_PASSWORD=${POSTGRES_DB_USER_PASSWORD}
     volumes:
       - local_pgdata:/var/lib/postgresql/data
   pgadmin:
