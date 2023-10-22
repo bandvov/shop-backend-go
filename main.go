@@ -13,10 +13,29 @@ import (
 
 func main() {
 	var err error
-	connString, err := getEnvVariable("CONN_STRING")
+
+	postgresUser, err := getEnvVariable("POSTGRES_DB_USER")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	postgresUserPassword, err := getEnvVariable("POSTGRES_DB_USER_PASSWORD")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	postgresHost, err := getEnvVariable("POSTGRES_DB_HOST")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	postgresPort, err := getEnvVariable("POSTGRES_DB_PORT")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	connString := fmt.Sprintf("postgresql://%v:%v@%v:%v/postgres?sslmode=disable", postgresUser, postgresUserPassword, postgresHost, postgresPort)
+
 	port, err := getEnvVariable("PORT")
 	if err != nil {
 		log.Fatal(err)
