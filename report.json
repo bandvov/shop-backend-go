@@ -1,0 +1,36 @@
+{"Time":"2023-10-22T18:19:40.4750074+03:00","Action":"start","Package":"github.com/bandvov/shop-backend-go"}
+{"Time":"2023-10-22T18:19:41.9118891+03:00","Action":"run","Package":"github.com/bandvov/shop-backend-go","Test":"TestApp_getUsers"}
+{"Time":"2023-10-22T18:19:41.9118891+03:00","Action":"output","Package":"github.com/bandvov/shop-backend-go","Test":"TestApp_getUsers","Output":"=== RUN   TestApp_getUsers\n"}
+{"Time":"2023-10-22T18:19:41.9148899+03:00","Action":"output","Package":"github.com/bandvov/shop-backend-go","Test":"TestApp_getUsers","Output":"--- PASS: TestApp_getUsers (0.00s)\n"}
+{"Time":"2023-10-22T18:19:41.9148899+03:00","Action":"pass","Package":"github.com/bandvov/shop-backend-go","Test":"TestApp_getUsers","Elapsed":0}
+{"Time":"2023-10-22T18:19:41.9148899+03:00","Action":"run","Package":"github.com/bandvov/shop-backend-go","Test":"TestApp_login"}
+{"Time":"2023-10-22T18:19:41.9148899+03:00","Action":"output","Package":"github.com/bandvov/shop-backend-go","Test":"TestApp_login","Output":"=== RUN   TestApp_login\n"}
+{"Time":"2023-10-22T18:19:41.9148899+03:00","Action":"output","Package":"github.com/bandvov/shop-backend-go","Test":"TestApp_login","Output":"{\"email\":\"test@test.aa\",\"password\":\"1\",\"created_at\":\"0001-01-01T00:00:00Z\",\"updated_at\":\"0001-01-01T00:00:00Z\"}\n"}
+{"Time":"2023-10-22T18:19:41.915893+03:00","Action":"output","Package":"github.com/bandvov/shop-backend-go","Test":"TestApp_login","Output":"\u0026{\u003cnil\u003e 0xc0000ba180}\n"}
+{"Time":"2023-10-22T18:19:41.915893+03:00","Action":"output","Package":"github.com/bandvov/shop-backend-go","Test":"TestApp_login","Output":"userExists {1 test@test.aa $2a$14$Gp3Kfg79XEZR5rV6ahOAjeIK225slynTJgZMhiHzlDLSHFrQKYolq   0001-01-01 00:00:00 +0000 UTC 0001-01-01 00:00:00 +0000 UTC}\n"}
+{"Time":"2023-10-22T18:19:42.6281581+03:00","Action":"output","Package":"github.com/bandvov/shop-backend-go","Test":"TestApp_login","Output":"--- PASS: TestApp_login (0.71s)\n"}
+{"Time":"2023-10-22T18:19:42.6286455+03:00","Action":"pass","Package":"github.com/bandvov/shop-backend-go","Test":"TestApp_login","Elapsed":0.71}
+{"Time":"2023-10-22T18:19:42.629176+03:00","Action":"run","Package":"github.com/bandvov/shop-backend-go","Test":"Test_getEnvVariable"}
+{"Time":"2023-10-22T18:19:42.629176+03:00","Action":"output","Package":"github.com/bandvov/shop-backend-go","Test":"Test_getEnvVariable","Output":"=== RUN   Test_getEnvVariable\n"}
+{"Time":"2023-10-22T18:19:42.629176+03:00","Action":"run","Package":"github.com/bandvov/shop-backend-go","Test":"Test_getEnvVariable/test_get_env_variables"}
+{"Time":"2023-10-22T18:19:42.629176+03:00","Action":"output","Package":"github.com/bandvov/shop-backend-go","Test":"Test_getEnvVariable/test_get_env_variables","Output":"=== RUN   Test_getEnvVariable/test_get_env_variables\n"}
+{"Time":"2023-10-22T18:19:42.629176+03:00","Action":"output","Package":"github.com/bandvov/shop-backend-go","Test":"Test_getEnvVariable/test_get_env_variables","Output":"--- PASS: Test_getEnvVariable/test_get_env_variables (0.00s)\n"}
+{"Time":"2023-10-22T18:19:42.629176+03:00","Action":"pass","Package":"github.com/bandvov/shop-backend-go","Test":"Test_getEnvVariable/test_get_env_variables","Elapsed":0}
+{"Time":"2023-10-22T18:19:42.629176+03:00","Action":"output","Package":"github.com/bandvov/shop-backend-go","Test":"Test_getEnvVariable","Output":"--- PASS: Test_getEnvVariable (0.00s)\n"}
+{"Time":"2023-10-22T18:19:42.629176+03:00","Action":"pass","Package":"github.com/bandvov/shop-backend-go","Test":"Test_getEnvVariable","Elapsed":0}
+{"Time":"2023-10-22T18:19:42.629176+03:00","Action":"run","Package":"github.com/bandvov/shop-backend-go","Test":"Test_validate"}
+{"Time":"2023-10-22T18:19:42.629176+03:00","Action":"output","Package":"github.com/bandvov/shop-backend-go","Test":"Test_validate","Output":"=== RUN   Test_validate\n"}
+{"Time":"2023-10-22T18:19:42.629176+03:00","Action":"run","Package":"github.com/bandvov/shop-backend-go","Test":"Test_validate/validate_all_required_field_valid"}
+{"Time":"2023-10-22T18:19:42.629176+03:00","Action":"output","Package":"github.com/bandvov/shop-backend-go","Test":"Test_validate/validate_all_required_field_valid","Output":"=== RUN   Test_validate/validate_all_required_field_valid\n"}
+{"Time":"2023-10-22T18:19:42.629176+03:00","Action":"output","Package":"github.com/bandvov/shop-backend-go","Test":"Test_validate/validate_all_required_field_valid","Output":"--- PASS: Test_validate/validate_all_required_field_valid (0.00s)\n"}
+{"Time":"2023-10-22T18:19:42.629176+03:00","Action":"pass","Package":"github.com/bandvov/shop-backend-go","Test":"Test_validate/validate_all_required_field_valid","Elapsed":0}
+{"Time":"2023-10-22T18:19:42.629176+03:00","Action":"run","Package":"github.com/bandvov/shop-backend-go","Test":"Test_validate/validate_all_required_field_not_valid"}
+{"Time":"2023-10-22T18:19:42.629176+03:00","Action":"output","Package":"github.com/bandvov/shop-backend-go","Test":"Test_validate/validate_all_required_field_not_valid","Output":"=== RUN   Test_validate/validate_all_required_field_not_valid\n"}
+{"Time":"2023-10-22T18:19:42.629176+03:00","Action":"output","Package":"github.com/bandvov/shop-backend-go","Test":"Test_validate/validate_all_required_field_not_valid","Output":"--- PASS: Test_validate/validate_all_required_field_not_valid (0.00s)\n"}
+{"Time":"2023-10-22T18:19:42.629176+03:00","Action":"pass","Package":"github.com/bandvov/shop-backend-go","Test":"Test_validate/validate_all_required_field_not_valid","Elapsed":0}
+{"Time":"2023-10-22T18:19:42.629176+03:00","Action":"output","Package":"github.com/bandvov/shop-backend-go","Test":"Test_validate","Output":"--- PASS: Test_validate (0.00s)\n"}
+{"Time":"2023-10-22T18:19:42.629176+03:00","Action":"pass","Package":"github.com/bandvov/shop-backend-go","Test":"Test_validate","Elapsed":0}
+{"Time":"2023-10-22T18:19:42.629176+03:00","Action":"output","Package":"github.com/bandvov/shop-backend-go","Output":"PASS\n"}
+{"Time":"2023-10-22T18:19:42.6302215+03:00","Action":"output","Package":"github.com/bandvov/shop-backend-go","Output":"\tgithub.com/bandvov/shop-backend-go\tcoverage: 38.1% of statements\n"}
+{"Time":"2023-10-22T18:19:42.6528222+03:00","Action":"output","Package":"github.com/bandvov/shop-backend-go","Output":"ok  \tgithub.com/bandvov/shop-backend-go\t2.177s\n"}
+{"Time":"2023-10-22T18:19:42.6528222+03:00","Action":"pass","Package":"github.com/bandvov/shop-backend-go","Elapsed":2.178}
